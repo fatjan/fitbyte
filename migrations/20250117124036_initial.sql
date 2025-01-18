@@ -56,10 +56,10 @@ create table if not exists activities (
     updated_at timestamptz default current_timestamp
 );
 
-CREATE INDEX IF NOT EXISTS user_id_idx ON activities USING HASH (user_id);
-CREATE INDEX IF NOT EXISTS user_id_doneAt_idx ON activities(user_id, doneAt);
-CREATE INDEX IF NOT EXISTS user_id_caloriesBurned_idx ON activities(user_id, caloriesBurned);
-CREATE INDEX IF NOT EXISTS user_id_activityType_idx ON activities(user_id, activityType);
+CREATE INDEX IF NOT EXISTS activities_user_id_idx ON activities USING HASH (user_id);
+CREATE INDEX IF NOT EXISTS activities_done_at_idx ON activities(user_id, done_at);
+CREATE INDEX IF NOT EXISTS activities_calories_burned_idx ON activities(user_id, calories_burned);
+CREATE INDEX IF NOT EXISTS activities_activity_type_idx ON activities(user_id, activity_type);
 
 -- +goose StatementEnd
 
