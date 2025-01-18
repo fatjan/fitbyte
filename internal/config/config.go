@@ -30,7 +30,6 @@ func LoadConfig() (*Config, error) {
 	return &Config{
 		App:    loadApplicationConfig(),
 		DB:     loadDatabaseConfig(),
-		TestDB: loadDatabaseTestConfig(),
 	}, nil
 }
 
