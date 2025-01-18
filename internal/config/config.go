@@ -12,7 +12,7 @@ import (
 type Config struct {
 	App    app
 	DB     db
-	TestDB db
+	JwtKey string
 }
 
 func LoadConfig() (*Config, error) {
@@ -28,8 +28,8 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return &Config{
-		App:    loadApplicationConfig(),
-		DB:     loadDatabaseConfig(),
+		App: loadApplicationConfig(),
+		DB:  loadDatabaseConfig(),
 	}, nil
 }
 

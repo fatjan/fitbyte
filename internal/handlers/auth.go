@@ -10,15 +10,16 @@ import (
 )
 
 type AuthHandler interface {
-	Post(ginCtx *gin.Context)
+	Login(ginCtx *gin.Context)
+	Register(ginCtx *gin.Context)
 }
 
 type authHandler struct {
 	authUseCase auth.UseCase
 }
 
-func NewAuthHandler(authUsecase auth.UseCase) AuthHandler {
-	return &authHandler{authUseCase: authUsecase}
+func NewAuthHandler(authUseCase auth.UseCase) AuthHandler {
+	return &authHandler{authUseCase: authUseCase}
 }
 
 func (r *authHandler) Register(ginCtx *gin.Context) {
@@ -33,7 +34,7 @@ func (r *authHandler) Register(ginCtx *gin.Context) {
 		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	ginCtx.JSON(http.StatusCreated, authResponse)
 }
 
@@ -45,9 +46,9 @@ func (r *authHandler) Login(ginCtx *gin.Context) {
 	}
 
 	authResponse, err := r.authUseCase.Login(&authRequest)
-		if err != nil {
-			ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
-			return
-		}
-		ginCtx.JSON(http.StatusOK, authResponse)
+	if err != nil {
+		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, authResponse)
 }

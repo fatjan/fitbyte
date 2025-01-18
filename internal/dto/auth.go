@@ -12,6 +12,7 @@ import (
 type AuthRequest struct {
 	Email    string
 	Password string
+	Name     string
 }
 
 type AuthResponse struct {

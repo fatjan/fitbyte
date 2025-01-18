@@ -19,8 +19,9 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, r *gin.Engine) {
 	duckHandler := NewDuckHandler(duckUsecase)
 
 	v1 := r.Group("v1")
-	
+
 	duckRouter := v1.Group("ducks")
+	duckRouter.Use(jwtMiddleware)
 	duckRouter.GET("/", duckHandler.GetDucks)
 	duckRouter.GET("/:id", duckHandler.GetDuckByID)
 
