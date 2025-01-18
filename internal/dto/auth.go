@@ -26,16 +26,10 @@ func (d *AuthRequest) ValidatePayloadAuth() error {
 	if d.Password == "" {
 		return exceptions.ErrorBadRequest
 	}
-	if d.Action == "" {
-		return exceptions.ErrorBadRequest
-	}
 	if !isValidEmail(d.Email) {
 		return exceptions.ErrorBadRequest
 	}
 	if !isValidPasswordLength(d.Password, 8, 32) {
-		return exceptions.ErrorBadRequest
-	}
-	if !isValidAction(d.Action) {
 		return exceptions.ErrorBadRequest
 	}
 	return nil
@@ -49,14 +43,6 @@ func isValidEmail(email string) bool {
 func isValidPasswordLength(password string, minLength, maxLength int) bool {
 	passwordLength := len(password)
 	return passwordLength >= minLength && passwordLength <= maxLength
-}
-
-func isValidAction(action string) bool {
-	validActions := map[string]bool{
-		"create": true,
-		"login":  true,
-	}
-	return validActions[action]
 }
 
 func (d *AuthRequest) SetName() {

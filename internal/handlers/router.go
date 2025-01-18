@@ -29,5 +29,6 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, r *gin.Engine) {
 	authHandler := NewAuthHandler(authUseCase)
 
 	authRouter := v1.Group("auth")
-	authRouter.POST("/", authHandler.Post)
+	authRouter.POST("/register", authHandler.Register)
+	authRouter.POST("/login", authHandler.Login)
 }
