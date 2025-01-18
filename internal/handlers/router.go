@@ -7,6 +7,8 @@ import (
 	duckRepo "github.com/fatjan/fitbyte/internal/repositories/duck"
 	authUseCase "github.com/fatjan/fitbyte/internal/usecases/auth"
 	duckUsecase "github.com/fatjan/fitbyte/internal/usecases/duck"
+	userRepository "github.com/fatjan/fitbyte/internal/repositories/user"
+	userUseCase "github.com/fatjan/fitbyte/internal/useCases/user"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 )
@@ -32,4 +34,13 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, r *gin.Engine) {
 	authRouter := v1.Group("auth")
 	authRouter.POST("/register", authHandler.Register)
 	authRouter.POST("/login", authHandler.Login)
+
+	userRepository := userRepository.NewUserRepository(db)
+	userUseCase := userUseCase.NewUseCase(userRepository)
+	userHandler := NewUserHandler(userUseCase)
+
+	userRouter := v1.Group("user")
+	userRouter.Use(jwtMiddleware)
+	userRouter.GET("/", userHandler.Get)
+	userRouter.PATCH("/", userHandler.Update)
 }
