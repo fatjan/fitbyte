@@ -43,7 +43,7 @@ create table if not exists users (
     updated_at timestamptz default current_timestamp
 );
 
-create index if not exists users_email_idx on users(email);
+CREATE INDEX IF NOT EXISTS users_email_idx ON users USING HASH (email);
 
 create table if not exists activities (
     id serial primary key,
@@ -55,6 +55,12 @@ create table if not exists activities (
     created_at timestamptz default current_timestamp,
     updated_at timestamptz default current_timestamp
 );
+
+CREATE INDEX IF NOT EXISTS user_id_idx ON activities USING HASH (user_id);
+CREATE INDEX IF NOT EXISTS user_id_doneAt_idx ON activities(user_id, doneAt);
+CREATE INDEX IF NOT EXISTS user_id_caloriesBurned_idx ON activities(user_id, caloriesBurned);
+CREATE INDEX IF NOT EXISTS user_id_activityType_idx ON activities(user_id, activityType);
+
 -- +goose StatementEnd
 
 -- +goose Down
