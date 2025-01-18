@@ -52,9 +52,9 @@ func (r *repository) FindByEmail(ctx context.Context, email string) (*models.Use
 	user := &models.User{}
 
 	err := r.db.QueryRowContext(ctx,
-		"SELECT id, email, password_hash, name FROM users WHERE email = $1",
+		"SELECT id, email, password_hash FROM users WHERE email = $1",
 		email,
-	).Scan(&user.ID, &user.Email, &user.Password, &user.Name)
+	).Scan(&user.ID, &user.Email, &user.Password)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
