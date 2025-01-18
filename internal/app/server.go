@@ -11,6 +11,15 @@ import (
 )
 
 func NewServer(cfg *config.Config, db *sqlx.DB) *http.Server {
+	switch cfg.App.Env {
+	case "production":
+		gin.SetMode(gin.ReleaseMode)
+	case "test":
+		gin.SetMode(gin.TestMode)
+	default:
+		gin.SetMode(gin.DebugMode)
+	}
+
 	router := gin.Default()
 	handlers.SetupRouter(cfg, db, router)
 
