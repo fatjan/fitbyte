@@ -58,20 +58,49 @@ func (r *repository) GetUser(id int) (*models.User, error) {
 		return nil, err
 	}
 
-	user.Preference = nullFields.Preference.String
-	user.WeightUnit = nullFields.WeightUnit.String
-	user.HeightUnit = nullFields.HeightUnit.String
-	
-	if nullFields.Weight.Valid {
-		user.Weight = fmt.Sprintf("%d", nullFields.Weight.Int64) // Convert Int64 to string if valid
+	if nullFields.Preference.Valid {
+		preference := nullFields.Preference.String
+		if preference == string(dto.Cardio) || preference == string(dto.Weight) {
+			user.Preference = dto.PreferenceType(preference)
+		} else {
+			user.Preference = "" 
+		}
 	} else {
-		user.Weight = "" // Handle NULL case
+		user.Preference = "" 
+	}
+
+	if nullFields.WeightUnit.Valid {
+		weightUnit := nullFields.WeightUnit.String
+		if weightUnit == string(dto.KG) || weightUnit == string(dto.LBS) {
+			user.WeightUnit = dto.WeightUnitType(weightUnit)
+		} else {
+			user.WeightUnit = "" 
+		}
+	} else {
+		user.WeightUnit = "" 
+	}
+
+	if nullFields.HeightUnit.Valid {
+		heightUnit := nullFields.HeightUnit.String
+		if heightUnit == string(dto.CM) || heightUnit == string(dto.INCH) {
+			user.HeightUnit = dto.HeightUnitType(heightUnit)
+		} else {
+			user.HeightUnit = "" 
+		}
+	} else {
+		user.HeightUnit = "" 
+	}
+
+	if nullFields.Weight.Valid {
+		user.Weight = int(nullFields.Weight.Int64)
+	} else {
+		user.Weight = 0
 	}
 	
 	if nullFields.Height.Valid {
-		user.Height = fmt.Sprintf("%d", nullFields.Height.Int64) // Convert Int64 to string if valid
+		user.Height = int(nullFields.Height.Int64)
 	} else {
-		user.Height = "" // Handle NULL case
+		user.Height = 0
 	}
 
 	user.Name = nullFields.Name.String

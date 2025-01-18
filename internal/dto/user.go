@@ -35,15 +35,30 @@ func (u *UserPatchRequest) Validate() error {
 	return nil
 }
 
+type PreferenceType string
+type WeightUnitType string
+type HeightUnitType string
+
+const (
+	Cardio	PreferenceType = "CARDIO"
+	Weight 	PreferenceType = "WEIGHT"
+
+	KG		WeightUnitType = "KG"
+	LBS		WeightUnitType = "LBS"
+
+	CM		HeightUnitType = "CM"
+	INCH	HeightUnitType = "INCH"
+)
+
 type User struct {
-	Preference      string `json:"preference"`
-	WeightUnit      string `json:"weightUnit"`
-	HeightUnit      string `json:"heightUnit"`
-	Weight      	string `json:"weight"`
-	Height      	string `json:"height"`
-	Email           string `json:"email"`
-	Name            string `json:"name"`
-	ImageUri    	string `json:"ImageUri"`
+	Preference      PreferenceType 	`json:"preference" validate:"oneof=CARDIO WEIGHT"`
+	WeightUnit      WeightUnitType 	`json:"weightUnit" validate:"oneof=KG LBS"`
+	HeightUnit      HeightUnitType	`json:"heightUnit" validate:"oneof=CM INCH"`
+	Weight      	int 			`json:"weight"`
+	Height      	int 			`json:"height"`
+	Email           string 			`json:"email"`
+	Name            string 			`json:"name"`
+	ImageUri    	string 			`json:"ImageUri"`
 }
 
 type UserRequest struct {
