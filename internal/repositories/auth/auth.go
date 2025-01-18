@@ -1,8 +1,9 @@
 package auth
 
 import (
+	"context"
 	"database/sql"
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/fatjan/fitbyte/internal/models"
@@ -19,39 +20,48 @@ func NewAuthRepository(db *sqlx.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) Post(user *models.User) (int, error) {
+func (r *repository) Post(ctx context.Context, user *models.User) (int, error) {
 	var newID int
 	now := time.Now()
-	err := r.db.QueryRow("INSERT INTO users (email, password_hash, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING id", user.Email, user.Password, now, now).Scan(&newID)
+
+	query := `
+			INSERT INTO users (email, password_hash, created_at, updated_at)
+			VALUES ($1, $2, $3, $4)
+			RETURNING id`
+
+	err := r.db.QueryRowContext(ctx, query,
+		user.Email,
+		user.Password,
+		now,
+		now,
+	).Scan(&newID)
+
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
-			if pqErr.Code == "23505" { // PostgreSQL code untuk unique violation
+			if pqErr.Code == pq.ErrorCode("23505") {
 				return 0, exceptions.ErrConflict
 			}
 		}
-		log.Println("error query")
 		return 0, err
 	}
 
 	return newID, nil
 }
 
-func (r *repository) FindByEmail(email string) (*models.User, error) {
+func (r *repository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	user := &models.User{}
 
-	err := r.db.QueryRow(
+	err := r.db.QueryRowContext(ctx,
 		"SELECT id, email, password_hash, name FROM users WHERE email = $1",
 		email,
 	).Scan(&user.ID, &user.Email, &user.Password, &user.Name)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// Handle case where no rows are found
 			return nil, nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to find user by email: %w", err)
 	}
 
 	return user, nil
-
 }

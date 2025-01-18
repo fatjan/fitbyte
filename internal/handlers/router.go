@@ -5,7 +5,7 @@ import (
 	"github.com/fatjan/fitbyte/internal/pkg/jwt_helper"
 	authRepository "github.com/fatjan/fitbyte/internal/repositories/auth"
 	duckRepo "github.com/fatjan/fitbyte/internal/repositories/duck"
-	authUseCase "github.com/fatjan/fitbyte/internal/useCases/auth"
+	authUseCase "github.com/fatjan/fitbyte/internal/usecases/auth"
 	duckUsecase "github.com/fatjan/fitbyte/internal/usecases/duck"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"

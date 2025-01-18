@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"context"
+
 	"github.com/fatjan/fitbyte/internal/config"
 	"github.com/fatjan/fitbyte/internal/dto"
 	"github.com/fatjan/fitbyte/internal/models"
@@ -21,14 +23,13 @@ func NewUseCase(authRepository auth.Repository, cfg *config.Config) UseCase {
 	}
 }
 
-func (uc *useCase) Login(authRequest *dto.AuthRequest) (*dto.AuthResponse, error) {
+func (uc *useCase) Login(ctx context.Context, authRequest *dto.AuthRequest) (*dto.AuthResponse, error) {
 	err := authRequest.ValidatePayloadAuth()
 	if err != nil {
 		return nil, err
 	}
-	authRequest.SetName()
 
-	user, err := uc.authRepository.FindByEmail(authRequest.Email)
+	user, err := uc.authRepository.FindByEmail(ctx, authRequest.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -53,12 +54,12 @@ func (uc *useCase) Login(authRequest *dto.AuthRequest) (*dto.AuthResponse, error
 	}, nil
 }
 
-func (uc *useCase) Register(authRequest *dto.AuthRequest) (*dto.AuthResponse, error) {
+func (uc *useCase) Register(ctx context.Context, authRequest *dto.AuthRequest) (*dto.AuthResponse, error) {
 	err := authRequest.ValidatePayloadAuth()
 	if err != nil {
 		return nil, err
 	}
-	authRequest.SetName()
+
 	err = authRequest.HashPassword()
 	if err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (uc *useCase) Register(authRequest *dto.AuthRequest) (*dto.AuthResponse, er
 		Password: authRequest.Password,
 	}
 
-	id, err := uc.authRepository.Post(newAuth)
+	id, err := uc.authRepository.Post(ctx, newAuth)
 	if err != nil {
 		return nil, err
 	}

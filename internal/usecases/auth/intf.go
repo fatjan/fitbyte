@@ -1,10 +1,12 @@
 package auth
 
 import (
+	"context"
+
 	"github.com/fatjan/fitbyte/internal/dto"
 )
 
 type UseCase interface {
-	Login(*dto.AuthRequest) (*dto.AuthResponse, error)
-	Register(*dto.AuthRequest) (*dto.AuthResponse, error)
+	Login(context.Context, *dto.AuthRequest) (*dto.AuthResponse, error)
+	Register(context.Context, *dto.AuthRequest) (*dto.AuthResponse, error)
 }

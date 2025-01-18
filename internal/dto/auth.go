@@ -3,7 +3,6 @@ package dto
 import (
 	"errors"
 	"regexp"
-	"strings"
 
 	"github.com/fatjan/fitbyte/internal/pkg/exceptions"
 	"golang.org/x/crypto/bcrypt"
@@ -12,7 +11,6 @@ import (
 type AuthRequest struct {
 	Email    string
 	Password string
-	Name     string
 }
 
 type AuthResponse struct {
@@ -46,17 +44,10 @@ func isValidPasswordLength(password string, minLength, maxLength int) bool {
 	return passwordLength >= minLength && passwordLength <= maxLength
 }
 
-func (d *AuthRequest) SetName() {
-	parts := strings.Split(d.Email, "@")
-	localPart := parts[0]
-	name := strings.ReplaceAll(localPart, ".", " ")
-	d.Name = name
-}
-
 func (d *AuthRequest) HashPassword() error {
 	resultHash, err := bcrypt.GenerateFromPassword([]byte(d.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return errors.New("ERROR HASHING")
+		return errors.New("error hashing")
 	}
 	d.Password = string(resultHash)
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatjan/fitbyte/internal/dto"
 	"github.com/fatjan/fitbyte/internal/pkg/exceptions"
-	"github.com/fatjan/fitbyte/internal/useCases/auth"
+	"github.com/fatjan/fitbyte/internal/usecases/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,11 +25,11 @@ func NewAuthHandler(authUseCase auth.UseCase) AuthHandler {
 func (r *authHandler) Register(ginCtx *gin.Context) {
 	var authRequest dto.AuthRequest
 	if err := ginCtx.BindJSON(&authRequest); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
 
-	authResponse, err := r.authUseCase.Register(&authRequest)
+	authResponse, err := r.authUseCase.Register(ginCtx.Request.Context(), &authRequest)
 	if err != nil {
 		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
 		return
@@ -41,11 +41,11 @@ func (r *authHandler) Register(ginCtx *gin.Context) {
 func (r *authHandler) Login(ginCtx *gin.Context) {
 	var authRequest dto.AuthRequest
 	if err := ginCtx.BindJSON(&authRequest); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
 
-	authResponse, err := r.authUseCase.Login(&authRequest)
+	authResponse, err := r.authUseCase.Login(ginCtx.Request.Context(), &authRequest)
 	if err != nil {
 		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
 		return
