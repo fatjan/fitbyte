@@ -58,7 +58,7 @@ type User struct {
 	Height      	int 			`json:"height"`
 	Email           string 			`json:"email"`
 	Name            string 			`json:"name"`
-	ImageUri    	string 			`json:"ImageUri"`
+	ImageUri    	string 			`json:"imageUri"`
 }
 
 type UserRequest struct {
