@@ -45,12 +45,12 @@ func (r *repository) GetUser(id int) (*models.User, error) {
 	from users 
 	where id = $1;`, id).Scan(
 		&user.Email,
+		&nullFields.Name,
 		&nullFields.Preference,
 		&nullFields.WeightUnit,
 		&nullFields.HeightUnit,
 		&nullFields.Weight,
 		&nullFields.Height,
-		&nullFields.Name,
 		&nullFields.ImageUri,
 	)
 
@@ -108,8 +108,8 @@ func (r *repository) GetUser(id int) (*models.User, error) {
 
 	return user, nil
 }
-func (r *repository) Update(ctx context.Context, userID int, request *dto.UserPatchRequest) error {
 
+func (r *repository) Update(ctx context.Context, userID int, request *dto.UserPatchRequest) error {
 	baseQuery := `UPDATE users SET `
 	var setClauses []string
 	var args []interface{}

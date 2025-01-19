@@ -66,13 +66,13 @@ type UserRequest struct {
 }
 
 type UserPatchRequest struct {
-	Preference      *string `json:"preference" validate:"required"`
-	WeightUnit      *string `json:"weight_unit" validate:"required"`
-	HeightUnit    	*string `json:"height_unit" validate:"required"`
-	Weight      	*string `json:"weight" validate:"required"`
-	Height      	*string `json:"height" validate:"required"`
+	Preference      *PreferenceType `json:"preference" validate:"required,oneof=CARDIO WEIGHT"`
+	WeightUnit      *WeightUnitType `json:"weightUnit" validate:"required,oneof=KG LBS"`
+	HeightUnit    	*HeightUnitType `json:"heightUnit" validate:"required,oneof=CM INCH"`
+	Weight      	*int `json:"weight" validate:"required"`
+	Height      	*int `json:"height" validate:"required"`
 	Name     		*string `json:"name" validate:"min=2,max=60"`
-	ImageUri 		*string `json:"imageUri" validate:"url"`
+	ImageUri 		*string `json:"imageUri" validate:"url,omitempty"`
 }
 
 // Create a custom URI validation function

@@ -57,8 +57,13 @@ func (u *useCase) UpdateUser(ctx context.Context, userID int, request *dto.UserP
 			updateRequest.ImageUri = request.ImageUri
 			user.ImageUri = *request.ImageUri
 		}
-
 	}
+
+	updateRequest.Preference = request.Preference
+	updateRequest.WeightUnit = request.WeightUnit
+	updateRequest.HeightUnit = request.HeightUnit
+	updateRequest.Weight = request.Weight
+	updateRequest.Height = request.Height
 
 	// Update user in repository
 	if err = u.userRepository.Update(ctx, userID, updateRequest); err != nil {
