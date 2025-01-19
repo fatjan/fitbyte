@@ -12,6 +12,7 @@ import (
 type Config struct {
 	App    app
 	DB     db
+	Aws    aws
 	JwtKey string
 }
 
@@ -30,6 +31,7 @@ func LoadConfig() (*Config, error) {
 	return &Config{
 		App: loadApplicationConfig(),
 		DB:  loadDatabaseConfig(),
+		Aws: loadAwsConfig(),
 	}, nil
 }
 
