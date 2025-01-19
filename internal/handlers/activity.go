@@ -14,6 +14,7 @@ import (
 type ActivityHandler interface {
 	Post(ginCtx *gin.Context)
 	Delete(ginCtx *gin.Context)
+	Update(ginCtx *gin.Context)
 }
 
 type activityHandler struct {
@@ -71,4 +72,38 @@ func (r *activityHandler) Delete(ginCtx *gin.Context) {
 	}
 
 	ginCtx.JSON(http.StatusOK, gin.H{"message": "activity deleted successfully"})
+}
+
+func (r *activityHandler) Update(ginCtx *gin.Context) {
+	if ginCtx.GetHeader("Content-Type") != "application/json" {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid content type"})
+		return
+	}
+
+	var activityRequest dto.ActivityRequest
+	if err := ginCtx.BindJSON(&activityRequest); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
+		return
+	}
+
+	var validate = validator.New()
+	validate.RegisterValidation("iso8601", internal_validator.ValidateISODate)
+	if err := validate.Struct(activityRequest); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id := ginCtx.Param("id")
+	userId := ginCtx.GetInt("user_id")
+	activityResponse, err := r.activityUseCase.UpdateActivity(ginCtx.Request.Context(), &activityRequest, userId, id)
+	if err != nil {
+		if err == exceptions.ErrNotFound {
+			ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is not found"})
+			return
+		}
+		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
+		return
+	}
+
+	ginCtx.JSON(http.StatusOK, activityResponse)
 }

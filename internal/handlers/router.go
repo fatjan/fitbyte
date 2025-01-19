@@ -43,4 +43,5 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, r *gin.Engine) {
 	activityRouter.Use(jwtMiddleware)
 	activityRouter.POST("/", activityHandler.Post)
 	activityRouter.DELETE("/:id", activityHandler.Delete)
+	activityRouter.PATCH("/:id", activityHandler.Update)
 }

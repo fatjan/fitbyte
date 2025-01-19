@@ -72,3 +72,43 @@ func (u *useCase) DeleteActivity(ctx context.Context, id string) error {
 
 	return nil
 }
+
+func (u *useCase) UpdateActivity(ctx context.Context, activity *dto.ActivityRequest, userID int, activityID string) (*dto.ActivityResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	activityIdInt, err := strconv.Atoi(activityID)
+	if err != nil {
+		return nil, err
+	}
+
+	newActivity := &models.Activity{
+		ActivityType:   activity.ActivityType,
+		DoneAt:         activity.DoneAt,
+		DurationInMin:  activity.DurationInMinutes,
+		CaloriesBurned: activity.ActivityType.GetTotalCalories(activity.DurationInMinutes),
+		ID:             activityIdInt,
+		UserId:         userID,
+	}
+
+	res, err := u.activityRepository.Update(ctx, newActivity)
+	if err != nil {
+		if err == exceptions.ErrNotFound {
+			return nil, exceptions.ErrNotFound
+		}
+		return nil, err
+	}
+
+	activityId := strconv.Itoa(res.ID)
+
+	return &dto.ActivityResponse{
+		ActivityId:        activityId,
+		ActivityType:      res.ActivityType,
+		DoneAt:            res.DoneAt,
+		DurationInMinutes: res.DurationInMin,
+		CaloriesBurned:    res.CaloriesBurned,
+		CreatedAt:         res.CreatedAt,
+		UpdatedAt:         res.UpdatedAt,
+	}, nil
+}
