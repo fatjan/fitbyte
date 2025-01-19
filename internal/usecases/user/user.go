@@ -3,9 +3,11 @@ package user
 import (
 	"context"
 	"fmt"
+	"log"
+	"errors"
+
 	"github.com/fatjan/fitbyte/internal/dto"
 	"github.com/fatjan/fitbyte/internal/repositories/user"
-	"log"
 )
 
 type useCase struct {
@@ -50,12 +52,18 @@ func (u *useCase) UpdateUser(ctx context.Context, userID int, request *dto.UserP
 		if request.Name != nil {
 			updateRequest.Name = request.Name
 			user.Name = *request.Name
+		} 
+		if request.Name == nil {
+			return nil, errors.New("invalid format")
 		}
 
 		// check key request ImageUri
 		if request.ImageUri != nil {
 			updateRequest.ImageUri = request.ImageUri
 			user.ImageUri = *request.ImageUri
+		} 
+		if request.ImageUri == nil {
+			return nil, errors.New("invalid format")
 		}
 	}
 

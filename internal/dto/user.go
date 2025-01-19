@@ -2,8 +2,6 @@ package dto
 
 import (
 	"fmt"
-	"net/url"
-	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -11,9 +9,6 @@ import (
 var validate = validator.New()
 
 func (u *UserPatchRequest) Validate() error {
-	// Register the custom URI validation
-	validate.RegisterValidation("uri", uriCustomValidate)
-
 	err := validate.Struct(u)
 	if err != nil {
 		// Handle validation errors here
@@ -69,10 +64,10 @@ type UserPatchRequest struct {
 	Preference *PreferenceType `json:"preference" validate:"required,oneof=CARDIO WEIGHT"`
 	WeightUnit *WeightUnitType `json:"weightUnit" validate:"required,oneof=KG LBS"`
 	HeightUnit *HeightUnitType `json:"heightUnit" validate:"required,oneof=CM INCH"`
-	Weight     *int            `json:"weight" validate:"required"`
-	Height     *int            `json:"height" validate:"required"`
-	Name       *string         `json:"name" validate:"omitempty,min=2,max=60"`
-	ImageUri   *string         `json:"imageUri" validate:"omitempty,url"`
+	Weight     *int            `json:"weight" validate:"required,min=10,max=1000"`
+	Height     *int            `json:"height" validate:"required,min=3,max=250"`
+	Name       *string         `json:"name" validate:"min=2,max=60"`
+	ImageUri   *string         `json:"imageUri" validate:"url"`
 }
 
 type UserPatchResponse struct {
@@ -83,25 +78,4 @@ type UserPatchResponse struct {
 	Height      	*int 			`json:"height"`
 	Name            string 			`json:"name"`
 	ImageUri    	string 			`json:"imageUri"`
-}
-
-// Create a custom URI validation function
-func uriCustomValidate(fl validator.FieldLevel) bool {
-	uri := fl.Field().String()
-	if uri == "" {
-		return true // It's valid if the field is empty (omitempty).
-	}
-
-	// Try to parse the URI
-	_, err := url.ParseRequestURI(uri)
-	if err != nil {
-		return false // URI is not valid
-	}
-
-	// Add custom validation logic https or http:
-	if !strings.HasPrefix(uri, "http://") && !strings.HasPrefix(uri, "https://") {
-		return false // Custom check to make sure the URI starts with http:// or https://
-	}
-
-	return true
 }
