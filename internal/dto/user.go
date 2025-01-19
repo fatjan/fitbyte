@@ -75,6 +75,16 @@ type UserPatchRequest struct {
 	ImageUri   *string         `json:"imageUri" validate:"omitempty,url"`
 }
 
+type UserPatchResponse struct {
+	Preference      *PreferenceType 	`json:"preference" validate:"oneof=CARDIO WEIGHT"`
+	WeightUnit      *WeightUnitType 	`json:"weightUnit" validate:"oneof=KG LBS"`
+	HeightUnit      *HeightUnitType	`json:"heightUnit" validate:"oneof=CM INCH"`
+	Weight      	*int 			`json:"weight"`
+	Height      	*int 			`json:"height"`
+	Name            string 			`json:"name"`
+	ImageUri    	string 			`json:"imageUri"`
+}
+
 // Create a custom URI validation function
 func uriCustomValidate(fl validator.FieldLevel) bool {
 	uri := fl.Field().String()

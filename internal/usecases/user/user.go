@@ -33,7 +33,7 @@ func (u *useCase) GetUser(userRequest *dto.UserRequest) (*dto.User, error) {
 		ImageUri:    	 user.ImageUri,
 	}, nil
 }
-func (u *useCase) UpdateUser(ctx context.Context, userID int, request *dto.UserPatchRequest) (*dto.User, error) {
+func (u *useCase) UpdateUser(ctx context.Context, userID int, request *dto.UserPatchRequest) (*dto.UserPatchResponse, error) {
 	// Get existing user
 	user, err := u.userRepository.GetUser(userID)
 	if err != nil {
@@ -72,12 +72,12 @@ func (u *useCase) UpdateUser(ctx context.Context, userID int, request *dto.UserP
 	}
 
 	// Return new user data
-	return &dto.User{
-		Preference:      user.Preference,
-		WeightUnit:		 user.WeightUnit,
-		HeightUnit:		 user.HeightUnit,
-		Weight:		 	 user.Weight,
-		Height:		 	 user.Height,
+	return &dto.UserPatchResponse{
+		Preference:      updateRequest.Preference,
+		WeightUnit:		 updateRequest.WeightUnit,
+		HeightUnit:		 updateRequest.HeightUnit,
+		Weight:		 	 updateRequest.Weight,
+		Height:		 	 updateRequest.Height,
 		Name:            user.Name,
 		ImageUri:    	 user.ImageUri,
 	}, nil

@@ -7,5 +7,5 @@ import (
 
 type UseCase interface {
 	GetUser(*dto.UserRequest) (*dto.User, error)
-	UpdateUser(context.Context, int, *dto.UserPatchRequest) (*dto.User, error)
+	UpdateUser(context.Context, int, *dto.UserPatchRequest) (*dto.UserPatchResponse, error)
 }
