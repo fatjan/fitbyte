@@ -8,4 +8,5 @@ import (
 
 type UseCase interface {
 	PostActivity(context.Context, *dto.ActivityRequest, int) (*dto.ActivityResponse, error)
+	DeleteActivity(ctx context.Context, id string) error
 }

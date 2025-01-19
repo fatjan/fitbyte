@@ -8,4 +8,5 @@ import (
 
 type Repository interface {
 	Post(ctx context.Context, activity *models.Activity) (*models.Activity, error)
+	Delete(ctx context.Context, id int) error
 }

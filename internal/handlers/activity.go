@@ -13,6 +13,7 @@ import (
 
 type ActivityHandler interface {
 	Post(ginCtx *gin.Context)
+	Delete(ginCtx *gin.Context)
 }
 
 type activityHandler struct {
@@ -50,4 +51,24 @@ func (r *activityHandler) Post(ginCtx *gin.Context) {
 	}
 
 	ginCtx.JSON(http.StatusCreated, activityResponse)
+}
+
+func (r *activityHandler) Delete(ginCtx *gin.Context) {
+	if ginCtx.GetHeader("Content-Type") != "application/json" {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid content type"})
+		return
+	}
+
+	id := ginCtx.Param("id")
+	err := r.activityUseCase.DeleteActivity(ginCtx.Request.Context(), id)
+	if err != nil {
+		if err == exceptions.ErrNotFound {
+			ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is not found"})
+			return
+		}
+		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
+		return
+	}
+
+	ginCtx.JSON(http.StatusOK, gin.H{"message": "activity deleted successfully"})
 }

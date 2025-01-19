@@ -6,6 +6,7 @@ import (
 
 	"github.com/fatjan/fitbyte/internal/dto"
 	"github.com/fatjan/fitbyte/internal/models"
+	"github.com/fatjan/fitbyte/internal/pkg/exceptions"
 	"github.com/fatjan/fitbyte/internal/repositories/activity"
 )
 
@@ -48,4 +49,26 @@ func (u *useCase) PostActivity(ctx context.Context, activity *dto.ActivityReques
 		CreatedAt:         res.CreatedAt,
 		UpdatedAt:         res.UpdatedAt,
 	}, nil
+}
+
+func (u *useCase) DeleteActivity(ctx context.Context, id string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	err = u.activityRepository.Delete(ctx, idInt)
+	if err != nil {
+		if err == exceptions.ErrNotFound {
+			return err
+		}
+
+		return err
+	}
+
+	return nil
 }

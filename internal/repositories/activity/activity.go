@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/fatjan/fitbyte/internal/models"
+	"github.com/fatjan/fitbyte/internal/pkg/exceptions"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -41,4 +42,23 @@ func (r *repository) Post(ctx context.Context, activity *models.Activity) (*mode
 	}
 
 	return activity, nil
+}
+
+func (r *repository) Delete(ctx context.Context, id int) error {
+	query := `DELETE FROM activities WHERE id = $1`
+	result, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return exceptions.ErrNotFound
+	}
+
+	return nil
 }
