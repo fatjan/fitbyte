@@ -2,10 +2,12 @@ package activity
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/fatjan/fitbyte/internal/dto"
 	"github.com/fatjan/fitbyte/internal/models"
+	"github.com/fatjan/fitbyte/internal/pkg/exceptions"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -138,4 +140,60 @@ func (r *repository) Get(ctx context.Context, activity *dto.ActivityQueryParamRe
 	}
 
 	return results, nil
+}
+
+func (r *repository) Delete(ctx context.Context, id int) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	query := `DELETE FROM activities WHERE id = $1`
+	result, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return exceptions.ErrNotFound
+	}
+
+	return nil
+}
+
+func (r *repository) Update(ctx context.Context, activity *models.Activity) (*models.Activity, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	query := `
+		UPDATE activities
+		SET activity_type = $1, done_at = $2, duration_in_minutes = $3, calories_burned = $4, updated_at = now()
+		WHERE id = $5 and user_id = $6
+		RETURNING id, created_at, updated_at
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		activity.ActivityType,
+		activity.DoneAt,
+		activity.DurationInMin,
+		activity.CaloriesBurned,
+		activity.ID,
+		activity.UserId,
+	).Scan(&activity.ID, &activity.CreatedAt, &activity.UpdatedAt)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, exceptions.ErrNotFound
+		}
+		return nil, err
+	}
+
+	return activity, nil
 }

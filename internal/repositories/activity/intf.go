@@ -10,4 +10,6 @@ import (
 type Repository interface {
 	Post(ctx context.Context, activity *models.Activity) (*models.Activity, error)
 	Get(ctx context.Context, activity *dto.ActivityQueryParamRequest) ([]*dto.ActivityResponse, error)
+	Delete(ctx context.Context, id int) error
+	Update(ctx context.Context, activity *models.Activity) (*models.Activity, error)
 }
