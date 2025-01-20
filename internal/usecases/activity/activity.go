@@ -49,3 +49,21 @@ func (u *useCase) PostActivity(ctx context.Context, activity *dto.ActivityReques
 		UpdatedAt:         res.UpdatedAt,
 	}, nil
 }
+
+func (u *useCase) GetActivity(ctx context.Context, activity *dto.ActivityQueryParamRequest, userId int) ([]*dto.ActivityResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	err := activity.ValidateActivityFilter()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := u.activityRepository.Get(ctx, activity)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}

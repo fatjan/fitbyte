@@ -12,6 +12,7 @@ import (
 )
 
 type ActivityHandler interface {
+	Get(ginCtx *gin.Context)
 	Post(ginCtx *gin.Context)
 }
 
@@ -50,4 +51,26 @@ func (r *activityHandler) Post(ginCtx *gin.Context) {
 	}
 
 	ginCtx.JSON(http.StatusCreated, activityResponse)
+}
+
+func (r *activityHandler) Get(ginCtx *gin.Context) {
+	if ginCtx.GetHeader("Content-Type") != "application/json" {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid content type"})
+		return
+	}
+
+	var activityRequest dto.ActivityQueryParamRequest
+	if err := ginCtx.BindJSON(&activityRequest); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
+		return
+	}
+
+	userId := ginCtx.GetInt("user_id")
+	activityResponses, err := r.activityUseCase.GetActivity(ginCtx.Request.Context(), &activityRequest, userId)
+	if err != nil {
+		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
+		return
+	}
+
+	ginCtx.JSON(http.StatusCreated, activityResponses)
 }
