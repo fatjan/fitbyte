@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -63,8 +62,6 @@ func (r *activityHandler) Get(ginCtx *gin.Context) {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
-
-	fmt.Println(activityRequest)
 
 	userId := ginCtx.GetInt("user_id")
 	activityResponses, err := r.activityUseCase.GetActivity(ginCtx.Request.Context(), &activityRequest, userId)

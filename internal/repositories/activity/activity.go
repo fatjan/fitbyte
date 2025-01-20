@@ -47,15 +47,15 @@ func (r *repository) Post(ctx context.Context, activity *models.Activity) (*mode
 	return activity, nil
 }
 
-func (r *repository) Get(ctx context.Context, activity *dto.ActivityQueryParamRequest) ([]*dto.ActivityResponse, error) {
+func (r *repository) Get(ctx context.Context, activity *dto.ActivityPayload, userId int) ([]*dto.ActivityResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 
 	var (
-		query  = `SELECT id, activity_type, done_at, duration_in_minutes, calories_burned, created_at FROM activities WHERE 1=1`
-		params []interface{}
-		idx    = 1
+		query  = `SELECT id, activity_type, done_at, duration_in_minutes, calories_burned, created_at FROM activities WHERE user_id=$1`
+		params = []interface{}{userId}
+		idx    = 2
 	)
 
 	// Add filters dynamically
@@ -65,13 +65,13 @@ func (r *repository) Get(ctx context.Context, activity *dto.ActivityQueryParamRe
 		idx++
 	}
 
-	if activity.DoneAtFrom != "" {
+	if !activity.DoneAtFrom.IsZero() {
 		query += ` AND done_at >= $` + fmt.Sprint(idx)
 		params = append(params, activity.DoneAtFrom)
 		idx++
 	}
 
-	if activity.DoneAtTo != "" {
+	if !activity.DoneAtTo.IsZero() {
 		query += ` AND done_at <= $` + fmt.Sprint(idx)
 		params = append(params, activity.DoneAtTo)
 		idx++

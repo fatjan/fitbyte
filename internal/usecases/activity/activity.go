@@ -56,12 +56,12 @@ func (u *useCase) GetActivity(ctx context.Context, activity *dto.ActivityQueryPa
 		return nil, err
 	}
 
-	err := activity.ValidateActivityFilter()
+	payload, err := activity.ValidateActivityFilter()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := u.activityRepository.Get(ctx, activity)
+	res, err := u.activityRepository.Get(ctx, payload, userId)
 	if err != nil {
 		return nil, err
 	}
