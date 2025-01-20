@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -63,6 +64,8 @@ func (r *activityHandler) Get(ginCtx *gin.Context) {
 		return
 	}
 
+	fmt.Println(activityRequest)
+
 	userId := ginCtx.GetInt("user_id")
 	activityResponses, err := r.activityUseCase.GetActivity(ginCtx.Request.Context(), &activityRequest, userId)
 	if err != nil {
@@ -70,7 +73,7 @@ func (r *activityHandler) Get(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusCreated, activityResponses)
+	ginCtx.JSON(http.StatusOK, activityResponses)
 }
 
 func (r *activityHandler) Delete(ginCtx *gin.Context) {

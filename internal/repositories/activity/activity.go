@@ -117,7 +117,7 @@ func (r *repository) Get(ctx context.Context, activity *dto.ActivityQueryParamRe
 			updatedAt       string
 		)
 
-		err := rows.Scan(&id, &activityType, &doneAt, &durationMinutes, &caloriesBurned, &createdAt, &updatedAt)
+		err := rows.Scan(&id, &activityType, &doneAt, &durationMinutes, &caloriesBurned, &createdAt)
 		if err != nil {
 			return nil, err
 		}
