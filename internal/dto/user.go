@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/fatjan/fitbyte/internal/models"
 )
 
 var validate = validator.New()
@@ -30,25 +31,10 @@ func (u *UserPatchRequest) Validate() error {
 	return nil
 }
 
-type PreferenceType string
-type WeightUnitType string
-type HeightUnitType string
-
-const (
-	Cardio	PreferenceType = "CARDIO"
-	Weight 	PreferenceType = "WEIGHT"
-
-	KG		WeightUnitType = "KG"
-	LBS		WeightUnitType = "LBS"
-
-	CM		HeightUnitType = "CM"
-	INCH	HeightUnitType = "INCH"
-)
-
 type User struct {
-	Preference      PreferenceType 	`json:"preference" validate:"oneof=CARDIO WEIGHT"`
-	WeightUnit      WeightUnitType 	`json:"weightUnit" validate:"oneof=KG LBS"`
-	HeightUnit      HeightUnitType	`json:"heightUnit" validate:"oneof=CM INCH"`
+	Preference      models.PreferenceType 	`json:"preference" validate:"oneof=CARDIO WEIGHT"`
+	WeightUnit      models.WeightUnitType 	`json:"weightUnit" validate:"oneof=KG LBS"`
+	HeightUnit      models.HeightUnitType	`json:"heightUnit" validate:"oneof=CM INCH"`
 	Weight      	int 			`json:"weight"`
 	Height      	int 			`json:"height"`
 	Email           string 			`json:"email"`
@@ -61,9 +47,9 @@ type UserRequest struct {
 }
 
 type UserPatchRequest struct {
-	Preference *PreferenceType `json:"preference" validate:"required,oneof=CARDIO WEIGHT"`
-	WeightUnit *WeightUnitType `json:"weightUnit" validate:"required,oneof=KG LBS"`
-	HeightUnit *HeightUnitType `json:"heightUnit" validate:"required,oneof=CM INCH"`
+	Preference *models.PreferenceType `json:"preference" validate:"required,oneof=CARDIO WEIGHT"`
+	WeightUnit *models.WeightUnitType `json:"weightUnit" validate:"required,oneof=KG LBS"`
+	HeightUnit *models.HeightUnitType `json:"heightUnit" validate:"required,oneof=CM INCH"`
 	Weight     *int            `json:"weight" validate:"required,min=10,max=1000"`
 	Height     *int            `json:"height" validate:"required,min=3,max=250"`
 	Name       *string         `json:"name" validate:"min=2,max=60"`
@@ -71,9 +57,9 @@ type UserPatchRequest struct {
 }
 
 type UserPatchResponse struct {
-	Preference      *PreferenceType 	`json:"preference" validate:"oneof=CARDIO WEIGHT"`
-	WeightUnit      *WeightUnitType 	`json:"weightUnit" validate:"oneof=KG LBS"`
-	HeightUnit      *HeightUnitType	`json:"heightUnit" validate:"oneof=CM INCH"`
+	Preference      *models.PreferenceType 	`json:"preference" validate:"oneof=CARDIO WEIGHT"`
+	WeightUnit      *models.WeightUnitType 	`json:"weightUnit" validate:"oneof=KG LBS"`
+	HeightUnit      *models.HeightUnitType	`json:"heightUnit" validate:"oneof=CM INCH"`
 	Weight      	*int 			`json:"weight"`
 	Height      	*int 			`json:"height"`
 	Name            string 			`json:"name"`

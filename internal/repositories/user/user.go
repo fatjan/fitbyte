@@ -60,8 +60,8 @@ func (r *repository) GetUser(id int) (*models.User, error) {
 
 	if nullFields.Preference.Valid {
 		preference := nullFields.Preference.String
-		if preference == string(dto.Cardio) || preference == string(dto.Weight) {
-			user.Preference = dto.PreferenceType(preference)
+		if preference == string(models.Cardio) || preference == string(models.Weight) {
+			user.Preference = models.PreferenceType(preference)
 		} else {
 			user.Preference = "" 
 		}
@@ -71,8 +71,8 @@ func (r *repository) GetUser(id int) (*models.User, error) {
 
 	if nullFields.WeightUnit.Valid {
 		weightUnit := nullFields.WeightUnit.String
-		if weightUnit == string(dto.KG) || weightUnit == string(dto.LBS) {
-			user.WeightUnit = dto.WeightUnitType(weightUnit)
+		if weightUnit == string(models.KG) || weightUnit == string(models.LBS) {
+			user.WeightUnit = models.WeightUnitType(weightUnit)
 		} else {
 			user.WeightUnit = "" 
 		}
@@ -82,8 +82,8 @@ func (r *repository) GetUser(id int) (*models.User, error) {
 
 	if nullFields.HeightUnit.Valid {
 		heightUnit := nullFields.HeightUnit.String
-		if heightUnit == string(dto.CM) || heightUnit == string(dto.INCH) {
-			user.HeightUnit = dto.HeightUnitType(heightUnit)
+		if heightUnit == string(models.CM) || heightUnit == string(models.INCH) {
+			user.HeightUnit = models.HeightUnitType(heightUnit)
 		} else {
 			user.HeightUnit = "" 
 		}
