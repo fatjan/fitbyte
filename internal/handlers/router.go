@@ -9,6 +9,8 @@ import (
 	activityUseCase "github.com/fatjan/fitbyte/internal/usecases/activity"
 	authUseCase "github.com/fatjan/fitbyte/internal/usecases/auth"
 	duckUsecase "github.com/fatjan/fitbyte/internal/usecases/duck"
+	userRepository "github.com/fatjan/fitbyte/internal/repositories/user"
+	userUseCase "github.com/fatjan/fitbyte/internal/usecases/user"
 	"github.com/fatjan/fitbyte/internal/usecases/file"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -39,6 +41,15 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, r *gin.Engine) {
 	authRouter := v1.Group("")
 	authRouter.POST("/register", authHandler.Register)
 	authRouter.POST("/login", authHandler.Login)
+
+	userRepository := userRepository.NewUserRepository(db)
+	userUseCase := userUseCase.NewUseCase(userRepository)
+	userHandler := NewUserHandler(userUseCase)
+
+	userRouter := v1.Group("user")
+	userRouter.Use(jwtMiddleware)
+	userRouter.GET("/", userHandler.Get)
+	userRouter.PATCH("/", userHandler.Update)
 
 	activityRepository := activityRepository.NewActivityRepository(db)
 	activityUseCase := activityUseCase.NewUseCase(activityRepository)
