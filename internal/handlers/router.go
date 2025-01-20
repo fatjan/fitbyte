@@ -9,12 +9,17 @@ import (
 	activityUseCase "github.com/fatjan/fitbyte/internal/usecases/activity"
 	authUseCase "github.com/fatjan/fitbyte/internal/usecases/auth"
 	duckUsecase "github.com/fatjan/fitbyte/internal/usecases/duck"
+	"github.com/fatjan/fitbyte/internal/usecases/file"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 )
 
 func SetupRouter(cfg *config.Config, db *sqlx.DB, r *gin.Engine) {
 	jwtMiddleware := jwt_helper.JWTMiddleware(cfg.JwtKey)
+
+	r.GET("/", func(c *gin.Context) {
+		c.Status(200)
+	})
 
 	duckRepository := duckRepo.NewDuckRepository(db)
 	duckUsecase := duckUsecase.NewDuckUsecase(duckRepository)
@@ -44,4 +49,11 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, r *gin.Engine) {
 	activityRouter.POST("/", activityHandler.Post)
 	activityRouter.DELETE("/:id", activityHandler.Delete)
 	activityRouter.PATCH("/:id", activityHandler.Update)
+
+	fileUsCase := file.NewUseCase(*cfg)
+	fileHandler := NewFileHandler(fileUsCase)
+
+	fileRouter := v1.Group("file")
+	fileRouter.Use(jwtMiddleware)
+	fileRouter.POST("/", fileHandler.Post)
 }
