@@ -26,7 +26,7 @@ func NewUserRepository(db *sqlx.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) GetUser(id int) (*models.User, error) {
+func (r *repository) GetUser(ctx context.Context, id int) (*models.User, error) {
 	nullFields := struct {
 		Preference      sql.NullString
 		WeightUnit      sql.NullString
@@ -39,19 +39,24 @@ func (r *repository) GetUser(id int) (*models.User, error) {
 
 	user := &models.User{}
 
-	err := r.db.QueryRow(`
-	select 
-		email, name, preference, weight_unit, height_unit, weight, height, image_uri 
-	from users 
-	where id = $1;`, id).Scan(
-		&user.Email,
-		&nullFields.Name,
-		&nullFields.Preference,
-		&nullFields.WeightUnit,
-		&nullFields.HeightUnit,
-		&nullFields.Weight,
-		&nullFields.Height,
-		&nullFields.ImageUri,
+	query := `
+		SELECT email, name, preference, weight_unit, height_unit, weight, height, image_uri 
+		FROM users 
+		WHERE id = $1;
+	`
+
+	err := r.db.QueryRowContext(
+			ctx,
+			query,
+			id).Scan(
+			&user.Email,
+			&nullFields.Name,
+			&nullFields.Preference,
+			&nullFields.WeightUnit,
+			&nullFields.HeightUnit,
+			&nullFields.Weight,
+			&nullFields.Height,
+			&nullFields.ImageUri,
 	)
 
 	if err != nil {

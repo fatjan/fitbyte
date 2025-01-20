@@ -6,6 +6,6 @@ import (
 )
 
 type UseCase interface {
-	GetUser(*dto.UserRequest) (*dto.User, error)
+	GetUser(context.Context, *dto.UserRequest) (*dto.User, error)
 	UpdateUser(context.Context, int, *dto.UserPatchRequest) (*dto.UserPatchResponse, error)
 }

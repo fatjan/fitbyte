@@ -7,6 +7,6 @@ import (
 )
 
 type Repository interface {
-	GetUser(id int) (*models.User, error)
+	GetUser(ctx context.Context, id int) (*models.User, error)
 	Update(context.Context, int, *dto.UserPatchRequest) error
 }
