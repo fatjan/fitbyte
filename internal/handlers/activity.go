@@ -56,11 +56,6 @@ func (r *activityHandler) Post(ginCtx *gin.Context) {
 }
 
 func (r *activityHandler) Delete(ginCtx *gin.Context) {
-	if ginCtx.GetHeader("Content-Type") != "application/json" {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid content type"})
-		return
-	}
-
 	id := ginCtx.Param("id")
 	if id == "" {
 		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is required"})
@@ -68,7 +63,7 @@ func (r *activityHandler) Delete(ginCtx *gin.Context) {
 	}
 
 	if _, err := strconv.Atoi(id); err != nil {
-		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "invalid activity id format"})
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "invalid id"})
 		return
 	}
 

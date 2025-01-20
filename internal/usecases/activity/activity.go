@@ -68,7 +68,7 @@ func (u *useCase) DeleteActivity(ctx context.Context, id string) error {
 	err = u.activityRepository.Delete(ctx, idInt)
 	if err != nil {
 		if err == exceptions.ErrNotFound {
-			return err
+			return exceptions.ErrNotFound
 		}
 
 		return err
