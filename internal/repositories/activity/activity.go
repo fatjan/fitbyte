@@ -3,7 +3,9 @@ package activity
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
+	"github.com/fatjan/fitbyte/internal/dto"
 	"github.com/fatjan/fitbyte/internal/models"
 	"github.com/fatjan/fitbyte/internal/pkg/exceptions"
 	"github.com/jmoiron/sqlx"
@@ -43,6 +45,101 @@ func (r *repository) Post(ctx context.Context, activity *models.Activity) (*mode
 	}
 
 	return activity, nil
+}
+
+func (r *repository) Get(ctx context.Context, activity *dto.ActivityPayload, userId int) ([]*dto.ActivityResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	var (
+		query  = `SELECT id, activity_type, done_at, duration_in_minutes, calories_burned, created_at FROM activities WHERE user_id=$1`
+		params = []interface{}{userId}
+		idx    = 2
+	)
+
+	// Add filters dynamically
+	if activity.ActivityType != "" {
+		query += ` AND activity_type = $` + fmt.Sprint(idx)
+		params = append(params, activity.ActivityType)
+		idx++
+	}
+
+	if !activity.DoneAtFrom.IsZero() {
+		query += ` AND done_at >= $` + fmt.Sprint(idx)
+		params = append(params, activity.DoneAtFrom)
+		idx++
+	}
+
+	if !activity.DoneAtTo.IsZero() {
+		query += ` AND done_at <= $` + fmt.Sprint(idx)
+		params = append(params, activity.DoneAtTo)
+		idx++
+	}
+
+	if activity.CaloriesBurnedMin > 0 {
+		query += ` AND calories_burned >= $` + fmt.Sprint(idx)
+		params = append(params, activity.CaloriesBurnedMin)
+		idx++
+	}
+
+	if activity.CaloriesBurnedMax > 0 {
+		query += ` AND calories_burned <= $` + fmt.Sprint(idx)
+		params = append(params, activity.CaloriesBurnedMax)
+		idx++
+	}
+
+	// Add pagination
+	query += ` LIMIT $` + fmt.Sprint(idx)
+	params = append(params, activity.Limit)
+	idx++
+
+	query += ` OFFSET $` + fmt.Sprint(idx)
+	params = append(params, activity.Offset)
+
+	// Execute the query
+	rows, err := r.db.QueryContext(ctx, query, params...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Parse the result
+	var results []*dto.ActivityResponse
+	for rows.Next() {
+		var (
+			id              string
+			activityType    models.ActivityType
+			doneAt          string
+			durationMinutes int
+			caloriesBurned  int
+			createdAt       string
+			updatedAt       string
+		)
+
+		err := rows.Scan(&id, &activityType, &doneAt, &durationMinutes, &caloriesBurned, &createdAt)
+		if err != nil {
+			return nil, err
+		}
+
+		// Append result to slice
+		results = append(results, &dto.ActivityResponse{
+			ActivityId:        id,
+			ActivityType:      activityType,
+			DoneAt:            doneAt,
+			DurationInMinutes: durationMinutes,
+			CaloriesBurned:    caloriesBurned,
+			CreatedAt:         createdAt,
+			UpdatedAt:         updatedAt,
+		})
+	}
+
+	// Check for any errors during iteration
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func (r *repository) Delete(ctx context.Context, id int) error {

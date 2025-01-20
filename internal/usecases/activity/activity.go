@@ -51,6 +51,24 @@ func (u *useCase) PostActivity(ctx context.Context, activity *dto.ActivityReques
 	}, nil
 }
 
+func (u *useCase) GetActivity(ctx context.Context, activity *dto.ActivityQueryParamRequest, userId int) ([]*dto.ActivityResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	payload, err := activity.ValidateActivityFilter()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := u.activityRepository.Get(ctx, payload, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (u *useCase) DeleteActivity(ctx context.Context, id string) error {
 	if err := ctx.Err(); err != nil {
 		return err

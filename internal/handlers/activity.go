@@ -13,6 +13,7 @@ import (
 )
 
 type ActivityHandler interface {
+	Get(ginCtx *gin.Context)
 	Post(ginCtx *gin.Context)
 	Delete(ginCtx *gin.Context)
 	Update(ginCtx *gin.Context)
@@ -53,6 +54,23 @@ func (r *activityHandler) Post(ginCtx *gin.Context) {
 	}
 
 	ginCtx.JSON(http.StatusCreated, activityResponse)
+}
+
+func (r *activityHandler) Get(ginCtx *gin.Context) {
+	var activityRequest dto.ActivityQueryParamRequest
+	if err := ginCtx.ShouldBindQuery(&activityRequest); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
+		return
+	}
+
+	userId := ginCtx.GetInt("user_id")
+	activityResponses, err := r.activityUseCase.GetActivity(ginCtx.Request.Context(), &activityRequest, userId)
+	if err != nil {
+		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
+		return
+	}
+
+	ginCtx.JSON(http.StatusOK, activityResponses)
 }
 
 func (r *activityHandler) Delete(ginCtx *gin.Context) {
