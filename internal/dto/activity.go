@@ -13,13 +13,13 @@ type ActivityRequest struct {
 }
 
 type ActivityQueryParamRequest struct {
-	Limit             int
-	Offset            int
-	ActivityType      string `validate:"oneof=Walking Yoga Stretching Cycling Swimming Dancing Hiking Running HIIT JumpRope"`
-	DoneAtFrom        string `validate:"iso8601"`
-	DoneAtTo          string `validate:"iso8601"`
-	CaloriesBurnedMin int
-	CaloriesBurnedMax int
+	Limit             int    `form:"limit"`
+	Offset            int    `form:"offset"`
+	ActivityType      string `form:"activity_type"`
+	DoneAtFrom        string `form:"done_at_from"`
+	DoneAtTo          string `form:"done_at_to"`
+	CaloriesBurnedMin int    `form:"calories_burned_min"`
+	CaloriesBurnedMax int    `form:"calories_burned_max"`
 }
 
 type ActivityResponse struct {

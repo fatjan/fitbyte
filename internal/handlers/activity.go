@@ -54,13 +54,8 @@ func (r *activityHandler) Post(ginCtx *gin.Context) {
 }
 
 func (r *activityHandler) Get(ginCtx *gin.Context) {
-	if ginCtx.GetHeader("Content-Type") != "application/json" {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid content type"})
-		return
-	}
-
 	var activityRequest dto.ActivityQueryParamRequest
-	if err := ginCtx.BindJSON(&activityRequest); err != nil {
+	if err := ginCtx.ShouldBindQuery(&activityRequest); err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
