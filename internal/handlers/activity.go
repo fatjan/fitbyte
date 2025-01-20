@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/fatjan/fitbyte/internal/dto"
 	"github.com/fatjan/fitbyte/internal/pkg/exceptions"
@@ -61,6 +62,16 @@ func (r *activityHandler) Delete(ginCtx *gin.Context) {
 	}
 
 	id := ginCtx.Param("id")
+	if id == "" {
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is required"})
+		return
+	}
+
+	if _, err := strconv.Atoi(id); err != nil {
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "invalid activity id format"})
+		return
+	}
+
 	err := r.activityUseCase.DeleteActivity(ginCtx.Request.Context(), id)
 	if err != nil {
 		if err == exceptions.ErrNotFound {
@@ -71,12 +82,23 @@ func (r *activityHandler) Delete(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, gin.H{"message": "activity deleted successfully"})
+	ginCtx.Status(http.StatusOK)
 }
 
 func (r *activityHandler) Update(ginCtx *gin.Context) {
 	if ginCtx.GetHeader("Content-Type") != "application/json" {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid content type"})
+		return
+	}
+
+	id := ginCtx.Param("id")
+	if id == "" {
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is required"})
+		return
+	}
+
+	if _, err := strconv.Atoi(id); err != nil {
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "invalid activity id format"})
 		return
 	}
 
@@ -93,7 +115,6 @@ func (r *activityHandler) Update(ginCtx *gin.Context) {
 		return
 	}
 
-	id := ginCtx.Param("id")
 	userId := ginCtx.GetInt("user_id")
 	activityResponse, err := r.activityUseCase.UpdateActivity(ginCtx.Request.Context(), &activityRequest, userId, id)
 	if err != nil {

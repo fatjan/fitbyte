@@ -56,9 +56,13 @@ func (u *useCase) DeleteActivity(ctx context.Context, id string) error {
 		return err
 	}
 
+	if id == "" {
+		return exceptions.ErrNotFound
+	}
+
 	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+	if err != nil || idInt <= 0 {
+		return exceptions.ErrNotFound
 	}
 
 	err = u.activityRepository.Delete(ctx, idInt)
@@ -76,6 +80,10 @@ func (u *useCase) DeleteActivity(ctx context.Context, id string) error {
 func (u *useCase) UpdateActivity(ctx context.Context, activity *dto.ActivityRequest, userID int, activityID string) (*dto.ActivityResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
+	}
+
+	if activityID == "" {
+		return nil, exceptions.ErrNotFound
 	}
 
 	activityIdInt, err := strconv.Atoi(activityID)
