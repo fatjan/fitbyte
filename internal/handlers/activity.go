@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/fatjan/fitbyte/internal/dto"
 	"github.com/fatjan/fitbyte/internal/pkg/exceptions"
@@ -13,6 +14,8 @@ import (
 
 type ActivityHandler interface {
 	Post(ginCtx *gin.Context)
+	Delete(ginCtx *gin.Context)
+	Update(ginCtx *gin.Context)
 }
 
 type activityHandler struct {
@@ -50,4 +53,73 @@ func (r *activityHandler) Post(ginCtx *gin.Context) {
 	}
 
 	ginCtx.JSON(http.StatusCreated, activityResponse)
+}
+
+func (r *activityHandler) Delete(ginCtx *gin.Context) {
+	id := ginCtx.Param("id")
+	if id == "" {
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is required"})
+		return
+	}
+
+	if _, err := strconv.Atoi(id); err != nil {
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "invalid id"})
+		return
+	}
+
+	err := r.activityUseCase.DeleteActivity(ginCtx.Request.Context(), id)
+	if err != nil {
+		if err == exceptions.ErrNotFound {
+			ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is not found"})
+			return
+		}
+		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
+		return
+	}
+
+	ginCtx.Status(http.StatusOK)
+}
+
+func (r *activityHandler) Update(ginCtx *gin.Context) {
+	if ginCtx.GetHeader("Content-Type") != "application/json" {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid content type"})
+		return
+	}
+
+	id := ginCtx.Param("id")
+	if id == "" {
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is required"})
+		return
+	}
+
+	if _, err := strconv.Atoi(id); err != nil {
+		ginCtx.JSON(http.StatusNotFound, gin.H{"error": "invalid activity id format"})
+		return
+	}
+
+	var activityRequest dto.ActivityRequest
+	if err := ginCtx.BindJSON(&activityRequest); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
+		return
+	}
+
+	var validate = validator.New()
+	validate.RegisterValidation("iso8601", internal_validator.ValidateISODate)
+	if err := validate.Struct(activityRequest); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userId := ginCtx.GetInt("user_id")
+	activityResponse, err := r.activityUseCase.UpdateActivity(ginCtx.Request.Context(), &activityRequest, userId, id)
+	if err != nil {
+		if err == exceptions.ErrNotFound {
+			ginCtx.JSON(http.StatusNotFound, gin.H{"error": "activityId is not found"})
+			return
+		}
+		ginCtx.JSON(exceptions.MapToHttpStatusCode(err), gin.H{"error": err.Error()})
+		return
+	}
+
+	ginCtx.JSON(http.StatusOK, activityResponse)
 }
