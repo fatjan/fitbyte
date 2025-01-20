@@ -35,7 +35,7 @@ func (r *userHandler) Get(ginCtx *gin.Context) {
 		UserID: id,
 	}
 
-	userResponse, err := r.userUseCase.GetUser(&userRequest)
+	userResponse, err := r.userUseCase.GetUser(ginCtx.Request.Context(), &userRequest)
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

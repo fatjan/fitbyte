@@ -18,8 +18,8 @@ func NewUseCase(userRepository user.Repository) UseCase {
 	return &useCase{userRepository: userRepository}
 }
 
-func (u *useCase) GetUser(userRequest *dto.UserRequest) (*dto.User, error) {
-	user, err := u.userRepository.GetUser(userRequest.UserID)
+func (u *useCase) GetUser(ctx context.Context, userRequest *dto.UserRequest) (*dto.User, error) {
+	user, err := u.userRepository.GetUser(ctx, userRequest.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (u *useCase) GetUser(userRequest *dto.UserRequest) (*dto.User, error) {
 }
 func (u *useCase) UpdateUser(ctx context.Context, userID int, request *dto.UserPatchRequest) (*dto.UserPatchResponse, error) {
 	// Get existing user
-	user, err := u.userRepository.GetUser(userID)
+	user, err := u.userRepository.GetUser(ctx, userID)
 	if err != nil {
 		log.Println(fmt.Errorf("failed to get user: %w", err))
 		return nil, err
