@@ -62,10 +62,14 @@ func (d *ActivityQueryParamRequest) ValidateActivityFilter() (*ActivityPayload, 
 
 	// Validate CaloriesBurnedMin and CaloriesBurnedMax
 	if d.CaloriesBurnedMin > d.CaloriesBurnedMax {
-		return nil, errors.New("caloriesBurnedMin cannot be greater than caloriesBurnedMax")
+		d.CaloriesBurnedMax = d.CaloriesBurnedMin
 	}
 	payloadData.CaloriesBurnedMin = d.CaloriesBurnedMin
 	payloadData.CaloriesBurnedMax = d.CaloriesBurnedMax
+
+	if payloadData.CaloriesBurnedMin == 0 {
+		payloadData.CaloriesBurnedMin = 1
+	}
 
 	// Parse DoneAtFrom
 	if d.DoneAtFrom != "" {
