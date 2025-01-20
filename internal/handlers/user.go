@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/fatjan/fitbyte/internal/dto"
-	urlValidator "github.com/fatjan/fitbyte/internal/pkg/validator"
-	"github.com/fatjan/fitbyte/internal/useCases/user"
+	internal_validator "github.com/fatjan/fitbyte/internal/pkg/validator"
+	"github.com/fatjan/fitbyte/internal/usecases/user"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -66,7 +66,7 @@ func (r *userHandler) Update(ginCtx *gin.Context) {
 	}
 
 	var validate = validator.New()
-	_ = validate.RegisterValidation("url", urlValidator.StrictURLValidation)
+	_ = validate.RegisterValidation("url", internal_validator.StrictURLValidation)
 
 	if err := validate.Struct(userRequest); err != nil {
 		log.Println(err.Error())

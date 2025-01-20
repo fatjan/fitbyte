@@ -1,4 +1,4 @@
-package validator
+package internal_validator
 
 import (
 	"regexp"
